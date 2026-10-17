@@ -1,23 +1,34 @@
 import { TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
 import { App } from './app';
+import { siteHost, SITE_NAME_PATTERN, tenantSlug } from './core/naming';
 
 describe('App', () => {
-  beforeEach(async () => {
+  it('should create the app', async () => {
     await TestBed.configureTestingModule({
       imports: [App],
+      providers: [provideRouter([])],
     }).compileComponents();
+
+    const fixture = TestBed.createComponent(App);
+    expect(fixture.componentInstance).toBeTruthy();
+  });
+});
+
+describe('naming', () => {
+  it('turns a company into a tenant slug', () => {
+    expect(tenantSlug('Acme Corp.')).toBe('acme-corp');
+    expect(tenantSlug('  Čokolada d.o.o. ')).toBe('cokolada-d-o-o');
+    expect(tenantSlug('')).toBe('tenant');
   });
 
-  it('should create the app', () => {
-    const fixture = TestBed.createComponent(App);
-    const app = fixture.componentInstance;
-    expect(app).toBeTruthy();
+  it('builds the site host', () => {
+    expect(siteHost('blog', 'acme')).toBe('blog.acme.mydomain.com');
   });
 
-  it('should render title', async () => {
-    const fixture = TestBed.createComponent(App);
-    await fixture.whenStable();
-    const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Hello, WordpressAsAServiceUi');
+  it('accepts DNS labels only', () => {
+    expect(SITE_NAME_PATTERN.test('my-blog')).toBe(true);
+    expect(SITE_NAME_PATTERN.test('My_Blog')).toBe(false);
+    expect(SITE_NAME_PATTERN.test('-blog')).toBe(false);
   });
 });

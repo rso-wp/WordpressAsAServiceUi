@@ -1,3 +1,62 @@
-/* You can add global styles to this file, and also import other style files */
-
 @import 'tailwindcss';
+
+/* White + WordPress blue. Values are the WordPress admin blues; all text pairings below meet WCAG AA on white. */
+@theme {
+  --color-wp-50: #f0f6fc;
+  --color-wp-100: #dbeaf6;
+  --color-wp-200: #b7d4ec;
+  --color-wp-500: #2271b1; /* WordPress blue, 5.0:1 on white */
+  --color-wp-600: #135e96; /* hover */
+  --color-wp-700: #0a4b78;
+  --color-wp-900: #072b46;
+
+  --font-sans:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell,
+    'Helvetica Neue', sans-serif;
+}
+
+@layer base {
+  html {
+    background-color: var(--color-white);
+    color: var(--color-slate-900);
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--color-wp-500);
+    outline-offset: 2px;
+  }
+
+  dialog::backdrop {
+    background: rgb(7 43 70 / 0.55);
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-md bg-wp-500 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-wp-600 disabled:cursor-not-allowed disabled:opacity-60;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-md border border-wp-500 bg-white px-4 py-2.5 text-sm font-semibold text-wp-600 transition-colors hover:bg-wp-50 disabled:cursor-not-allowed disabled:opacity-60;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-100;
+  }
+
+  .field-label {
+    @apply mb-1 block text-sm font-medium text-slate-800;
+  }
+
+  .field-input {
+    @apply block w-full rounded-md border border-slate-400 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-500 focus:border-wp-500 focus:ring-2 focus:ring-wp-200 focus:outline-none aria-[invalid=true]:border-red-700;
+  }
+
+  .field-error {
+    @apply mt-1 text-sm text-red-700;
+  }
+
+  .card {
+    @apply rounded-xl border border-slate-200 bg-white shadow-sm;
+  }
+}
