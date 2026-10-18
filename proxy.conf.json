@@ -1,0 +1,5 @@
+{
+  "/graphql": { "target": "http://localhost:5076", "secure": false },
+  "/payment-methods": { "target": "http://localhost:5264", "secure": false },
+  "/provisions": { "target": "http://localhost:5151", "secure": false }
+}

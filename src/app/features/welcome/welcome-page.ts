@@ -16,8 +16,10 @@ import { FieldError, showInvalid } from '../../shared/field-error';
   template: `
     <div class="min-h-screen bg-wp-50 px-4 py-10 sm:py-16">
       <div class="mx-auto max-w-lg">
-        <header class="mb-8">
+        <!-- Sign out lives outside the form: validation messages appearing on blur would move it mid-click. -->
+        <header class="mb-8 flex items-center justify-between">
           <app-brand-mark class="block text-wp-700" />
+          <button type="button" class="btn-ghost" (click)="signOut()">Sign out</button>
         </header>
 
         <main class="card p-6 sm:p-8">
@@ -66,18 +68,19 @@ import { FieldError, showInvalid } from '../../shared/field-error';
                 aria-describedby="company-hint company-error"
               />
               <p id="company-hint" class="mt-1 text-sm text-slate-600">
-                Your sites will live at
-                <span class="font-medium text-wp-700">*.{{ tenant() }}.{{ baseDomain }}</span>
+                Your sites will live at addresses like
+                <span class="font-medium text-wp-700">blog.{{ tenant() }}.{{ baseDomain }}</span>
               </p>
               <app-field-error [field]="f.company" errorId="company-error" />
             </div>
 
             @if (error(); as message) {
-              <p class="rounded-md bg-red-50 p-3 text-sm text-red-800" role="alert">{{ message }}</p>
+              <p class="rounded-md bg-red-50 p-3 text-sm text-red-800" role="alert">
+                {{ message }}
+              </p>
             }
 
-            <div class="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:items-center sm:justify-between">
-              <button type="button" class="btn-ghost" (click)="signOut()">Sign out</button>
+            <div class="flex justify-end pt-2">
               <button type="submit" class="btn-primary" [disabled]="saving()">
                 {{ saving() ? 'Saving…' : 'Continue' }}
               </button>
@@ -124,7 +127,11 @@ export class WelcomePage {
         this.error.set(null);
         try {
           const { name, lastname, company } = this.model();
-          await this.profile.save({ name: name.trim(), lastname: lastname.trim(), company: company.trim() });
+          await this.profile.save({
+            name: name.trim(),
+            lastname: lastname.trim(),
+            company: company.trim(),
+          });
           await this.router.navigateByUrl('/sites');
         } catch {
           this.error.set('Your details could not be saved. Please try again.');

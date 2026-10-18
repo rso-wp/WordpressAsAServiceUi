@@ -5,8 +5,13 @@ import { latency, readMock, removeMock, writeMock } from './mock-storage';
 /** Pretends to be Entra ID: "signing in" always succeeds as the same demo account. */
 @Service()
 export class MockAuthService extends AuthService {
-  private readonly current = signal<AuthAccount | null>(readMock<AuthAccount | null>('session', null));
+  readonly kind = 'mock';
+  private readonly current = signal<AuthAccount | null>(
+    readMock<AuthAccount | null>('session', null),
+  );
   readonly account = this.current.asReadonly();
+
+  async initialize(): Promise<void> {}
 
   async signIn(): Promise<void> {
     await latency(700);
@@ -21,6 +26,10 @@ export class MockAuthService extends AuthService {
   async signOut(): Promise<void> {
     removeMock('session');
     this.current.set(null);
+  }
+
+  async requestHeaders(): Promise<Record<string, string>> {
+    return {};
   }
 
   private start(): void {

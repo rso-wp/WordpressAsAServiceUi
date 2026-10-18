@@ -42,6 +42,7 @@ export class MockProvisioningApi extends ProvisioningApi {
         const status = statusOf(site, now);
         return {
           name: site.name,
+          host: site.host,
           provisioningStatus: status,
           startDate: new Date(site.createdAt).toISOString(),
           url: status === 'Provisioned' || status === 'Deleting' ? `https://${site.host}` : null,
@@ -71,7 +72,9 @@ export class MockProvisioningApi extends ProvisioningApi {
     await latency(400);
     this.write(
       this.read().map((site) =>
-        site.name === name ? { ...site, deleteRequestedAt: site.deleteRequestedAt ?? Date.now() } : site,
+        site.name === name
+          ? { ...site, deleteRequestedAt: site.deleteRequestedAt ?? Date.now() }
+          : site,
       ),
     );
   }
