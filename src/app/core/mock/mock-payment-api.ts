@@ -37,7 +37,7 @@ export class MockPaymentApi extends PaymentApi {
   }
 
   private key(): string {
-    return `cards.${this.auth.account()?.oid ?? 'anonymous'}`;
+    return `cards.${this.auth.account()?.id ?? 'anonymous'}`;
   }
 }
 

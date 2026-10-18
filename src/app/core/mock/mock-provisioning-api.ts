@@ -57,7 +57,7 @@ export class MockProvisioningApi extends ProvisioningApi {
       throw new SiteNameTakenError(`You already have a site called "${name}".`);
     }
 
-    const card = readMock<{ id: string; last4: string }[]>(`cards.${this.oid()}`, []).find(
+    const card = readMock<{ id: string; last4: string }[]>(`cards.${this.userId()}`, []).find(
       (c) => c.id === paymentMethodId,
     );
     if (card?.last4 === '0002') {
@@ -79,16 +79,16 @@ export class MockProvisioningApi extends ProvisioningApi {
     );
   }
 
-  private oid(): string {
-    return this.auth.account()?.oid ?? 'anonymous';
+  private userId(): string {
+    return this.auth.account()?.id ?? 'anonymous';
   }
 
   private read(): MockSite[] {
-    return readMock<MockSite[]>(`sites.${this.oid()}`, []);
+    return readMock<MockSite[]>(`sites.${this.userId()}`, []);
   }
 
   private write(sites: MockSite[]): void {
-    writeMock(`sites.${this.oid()}`, sites);
+    writeMock(`sites.${this.userId()}`, sites);
   }
 }
 

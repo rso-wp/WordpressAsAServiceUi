@@ -15,8 +15,8 @@ export class MockUserApi extends UserApi {
     const users = readMock<Record<string, UserProfile>>('users', {});
 
     // Like UserService: the first `me` creates the user.
-    users[account.oid] ??= {
-      id: account.oid,
+    users[account.id] ??= {
+      id: account.id,
       email: account.email,
       name: null,
       lastname: null,
@@ -24,7 +24,7 @@ export class MockUserApi extends UserApi {
       tenant: null,
     };
     writeMock('users', users);
-    return users[account.oid];
+    return users[account.id];
   }
 
   async patchMe(input: ProfileInput): Promise<UserProfile> {
