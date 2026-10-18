@@ -15,7 +15,9 @@ export class SitesStore {
   readonly loadError = signal<string | null>(null);
 
   readonly inProgress = computed(() =>
-    this.sites().some((s) => s.provisioningStatus === 'Queued' || s.provisioningStatus === 'Deleting'),
+    this.sites().some(
+      (s) => s.provisioningStatus === 'Queued' || s.provisioningStatus === 'Deleting',
+    ),
   );
 
   async refresh(): Promise<void> {

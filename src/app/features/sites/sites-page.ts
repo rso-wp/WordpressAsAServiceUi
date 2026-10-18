@@ -23,7 +23,9 @@ const ANNOUNCE: Partial<Record<ProvisioningStatus, string>> = {
       <p class="mt-1 text-slate-600">Start a new WordPress site or manage the ones you have.</p>
 
       <section class="card mt-8 p-6" aria-labelledby="new-site-title">
-        <h2 id="new-site-title" class="mb-4 text-lg font-semibold text-slate-900">Start a new site</h2>
+        <h2 id="new-site-title" class="mb-4 text-lg font-semibold text-slate-900">
+          Start a new site
+        </h2>
         <app-new-site-form
           [tenant]="profile.tenant()"
           [existingNames]="siteNames()"

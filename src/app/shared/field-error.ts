@@ -16,7 +16,9 @@ export class FieldError {
 
   protected readonly message = computed(() => {
     const state = this.field()();
-    return state.touched() && state.invalid() ? (state.errors()[0]?.message ?? 'Invalid value.') : null;
+    return state.touched() && state.invalid()
+      ? (state.errors()[0]?.message ?? 'Invalid value.')
+      : null;
   });
 }
 

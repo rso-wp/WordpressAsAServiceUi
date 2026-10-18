@@ -2,6 +2,7 @@ import { inject, Service } from '@angular/core';
 import { AuthService } from '../api/auth.service';
 import { UserApi } from '../api/user-api';
 import { ProfileInput, UserProfile } from '../models';
+import { tenantSlug } from '../naming';
 import { latency, readMock, writeMock } from './mock-storage';
 
 @Service()
@@ -20,6 +21,7 @@ export class MockUserApi extends UserApi {
       name: null,
       lastname: null,
       company: null,
+      tenant: null,
     };
     writeMock('users', users);
     return users[account.oid];
@@ -28,7 +30,8 @@ export class MockUserApi extends UserApi {
   async patchMe(input: ProfileInput): Promise<UserProfile> {
     await latency(500);
     const current = await this.me();
-    const updated = { ...current, ...input };
+    // Like UserService: the tenant is assigned once, from the first company.
+    const updated = { ...current, ...input, tenant: current.tenant ?? tenantSlug(input.company) };
     const users = readMock<Record<string, UserProfile>>('users', {});
     users[updated.id] = updated;
     writeMock('users', users);

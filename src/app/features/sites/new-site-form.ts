@@ -61,7 +61,8 @@ export class NewSiteForm {
   protected readonly f = form(this.model, (p) => {
     required(p.name, { message: 'Give your site a name.' });
     pattern(p.name, SITE_NAME_PATTERN, {
-      message: 'Use lowercase letters, numbers and hyphens (not at the start or end), up to 30 characters.',
+      message:
+        'Use lowercase letters, numbers and hyphens (not at the start or end), up to 30 characters.',
     });
     validate(p.name, ({ value }) =>
       this.existingNames().includes(value())
