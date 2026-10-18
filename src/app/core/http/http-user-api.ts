@@ -1,21 +1,17 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Service } from '@angular/core';
-import { firstValueFrom } from 'rxjs';
-import { environment } from '../../../environments/environment';
+import { AuthService, endSession } from '../api/auth.service';
 import { UserApi } from '../api/user-api';
 import { ProfileInput, UserProfile } from '../models';
+import { GraphQlError, postGraphQl, SESSION_ERROR_CODES } from './graphql';
 
 const USER_FIELDS = 'id email name lastname company tenant';
-
-interface GraphQlResponse<T> {
-  data?: T;
-  errors?: { message: string }[];
-}
 
 /** UserService over GraphQL (`POST /graphql`). */
 @Service()
 export class HttpUserApi extends UserApi {
   private readonly http = inject(HttpClient);
+  private readonly auth = inject(AuthService);
 
   async me(): Promise<UserProfile> {
     return (await this.query<{ me: UserProfile }>(`query { me { ${USER_FIELDS} } }`)).me;
@@ -27,12 +23,14 @@ export class HttpUserApi extends UserApi {
   }
 
   private async query<T>(query: string, variables?: Record<string, unknown>): Promise<T> {
-    const response = await firstValueFrom(
-      this.http.post<GraphQlResponse<T>>(`${environment.apiBaseUrl}/graphql`, { query, variables }),
-    );
-    if (response.errors?.length || !response.data) {
-      throw new Error(response.errors?.[0]?.message ?? 'GraphQL request failed.');
+    try {
+      return await postGraphQl<T>(this.http, query, variables);
+    } catch (error) {
+      // GraphQL reports a rejected token as an error in a 200 response, not as a 401.
+      if (error instanceof GraphQlError && error.code && SESSION_ERROR_CODES.includes(error.code)) {
+        await endSession(this.auth);
+      }
+      throw error;
     }
-    return response.data;
   }
 }

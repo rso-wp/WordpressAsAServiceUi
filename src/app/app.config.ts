@@ -16,8 +16,7 @@ import { AuthService } from './core/api/auth.service';
 import { PaymentApi } from './core/api/payment-api';
 import { ProvisioningApi } from './core/api/provisioning-api';
 import { UserApi } from './core/api/user-api';
-import { DevAuthService } from './core/auth/dev-auth.service';
-import { EntraAuthService } from './core/auth/entra-auth.service';
+import { PasswordAuthService } from './core/auth/password-auth.service';
 import { authInterceptor } from './core/http/auth.interceptor';
 import { HttpPaymentApi } from './core/http/http-payment-api';
 import { HttpProvisioningApi } from './core/http/http-provisioning-api';
@@ -28,8 +27,7 @@ import { MockProvisioningApi } from './core/mock/mock-provisioning-api';
 import { MockUserApi } from './core/mock/mock-user-api';
 
 const AUTH: Record<Environment['auth']['mode'], Type<AuthService>> = {
-  entra: EntraAuthService,
-  dev: DevAuthService,
+  password: PasswordAuthService,
   mock: MockAuthService,
 };
 

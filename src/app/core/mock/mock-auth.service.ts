@@ -1,8 +1,8 @@
 import { Service, signal } from '@angular/core';
-import { AuthAccount, AuthService } from '../api/auth.service';
+import { AuthAccount, AuthService, Credentials } from '../api/auth.service';
 import { latency, readMock, removeMock, writeMock } from './mock-storage';
 
-/** Pretends to be Entra ID: "signing in" always succeeds as the same demo account. */
+/** Pretends to be UserService sign-in: any email and password work, always as the same demo user. */
 @Service()
 export class MockAuthService extends AuthService {
   readonly kind = 'mock';
@@ -13,14 +13,14 @@ export class MockAuthService extends AuthService {
 
   async initialize(): Promise<void> {}
 
-  async signIn(): Promise<void> {
+  async signIn(credentials: Credentials): Promise<void> {
     await latency(700);
-    this.start();
+    this.start(credentials.email);
   }
 
-  async signUp(): Promise<void> {
+  async signUp(credentials: Credentials): Promise<void> {
     await latency(700);
-    this.start();
+    this.start(credentials.email);
   }
 
   async signOut(): Promise<void> {
@@ -32,10 +32,10 @@ export class MockAuthService extends AuthService {
     return {};
   }
 
-  private start(): void {
+  private start(email: string): void {
     const account: AuthAccount = {
-      oid: '3f2b6c1e-8d4a-4a7e-9b1c-5e6f7a8b9c0d',
-      email: 'demo@contoso.com',
+      id: '3f2b6c1e-8d4a-4a7e-9b1c-5e6f7a8b9c0d',
+      email: email.trim().toLowerCase() || 'demo@contoso.com',
     };
     writeMock('session', account);
     this.current.set(account);
