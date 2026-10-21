@@ -1,6 +1,6 @@
 import { computed, inject, Service, signal } from '@angular/core';
 import { ProvisioningApi } from './api/provisioning-api';
-import { ProvisionedSite } from './models';
+import { inProgress, ProvisionedSite } from './models';
 
 const POLL_MS = 2000;
 
@@ -14,11 +14,7 @@ export class SitesStore {
   readonly loaded = signal(false);
   readonly loadError = signal<string | null>(null);
 
-  readonly inProgress = computed(() =>
-    this.sites().some(
-      (s) => s.provisioningStatus === 'Queued' || s.provisioningStatus === 'Deleting',
-    ),
-  );
+  readonly inProgress = computed(() => this.sites().some((s) => inProgress(s.provisioningStatus)));
 
   async refresh(): Promise<void> {
     clearTimeout(this.timer);
@@ -35,10 +31,16 @@ export class SitesStore {
     }
   }
 
-  /** Throws `SubscriptionDeclinedError` / `SiteNameTakenError` (fail fast); on success the site shows up as Queued. */
+  /**
+   * Throws `SubscriptionDeclinedError` / `SiteNameTakenError` (fail fast); on success the site shows up as Queued. The
+   * list is refreshed either way: after an unconfirmed payment (502) the site shows up as PendingPayment.
+   */
   async start(name: string, paymentMethodId: string): Promise<void> {
-    await this.api.create(name, paymentMethodId);
-    await this.refresh();
+    try {
+      await this.api.create(name, paymentMethodId);
+    } finally {
+      await this.refresh();
+    }
   }
 
   async remove(name: string): Promise<void> {

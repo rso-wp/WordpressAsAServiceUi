@@ -18,7 +18,12 @@ export interface ProfileInput {
 }
 
 /** ProvisioningService `ProvisioningStatus`. */
-export type ProvisioningStatus = 'Queued' | 'Provisioned' | 'Failed' | 'Deleting';
+export type ProvisioningStatus = 'PendingPayment' | 'Queued' | 'Provisioned' | 'Failed' | 'Deleting';
+
+/** Still changing on its own: the site list polls while any site is in one of these. */
+export function inProgress(status: ProvisioningStatus): boolean {
+  return status === 'PendingPayment' || status === 'Queued' || status === 'Deleting';
+}
 
 /** One entry of ProvisioningService `GET /provisions`. */
 export interface ProvisionedSite {

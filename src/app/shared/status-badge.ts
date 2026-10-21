@@ -1,7 +1,8 @@
 import { Component, computed, input } from '@angular/core';
-import { ProvisioningStatus } from '../core/models';
+import { inProgress, ProvisioningStatus } from '../core/models';
 
 const LOOK: Record<ProvisioningStatus, { label: string; classes: string }> = {
+  PendingPayment: { label: 'Confirming payment', classes: 'bg-amber-50 text-amber-900 ring-amber-300' },
   Queued: { label: 'Setting up', classes: 'bg-amber-50 text-amber-900 ring-amber-300' },
   Provisioned: { label: 'Running', classes: 'bg-green-50 text-green-800 ring-green-300' },
   Failed: { label: 'Failed', classes: 'bg-red-50 text-red-800 ring-red-300' },
@@ -30,7 +31,5 @@ const LOOK: Record<ProvisioningStatus, { label: string; classes: string }> = {
 export class StatusBadge {
   readonly status = input.required<ProvisioningStatus>();
   protected readonly look = computed(() => LOOK[this.status()]);
-  protected readonly working = computed(
-    () => this.status() === 'Queued' || this.status() === 'Deleting',
-  );
+  protected readonly working = computed(() => inProgress(this.status()));
 }
