@@ -40,8 +40,10 @@ import { StatusBadge } from '../../shared/status-badge';
 
               @if (site.provisioningStatus === 'Failed') {
                 <p class="mt-2 text-sm text-red-800">
-                  Setting up this site failed. Delete it to free the name and try again.
+                  Setting up this site failed. We keep trying; delete it to cancel the subscription.
                 </p>
+              } @else if (site.provisioningStatus === 'PendingPayment') {
+                <p class="mt-2 text-sm text-slate-600">Confirming your payment…</p>
               } @else if (site.provisioningStatus === 'Queued') {
                 <p class="mt-2 text-sm text-slate-600">
                   Creating the database and starting WordPress…
@@ -64,7 +66,8 @@ import { StatusBadge } from '../../shared/status-badge';
                   WP Admin<span class="sr-only"> for {{ site.name }} (opens in a new tab)</span>
                 </a>
               }
-              @if (site.provisioningStatus !== 'Deleting') {
+              <!-- A site whose payment is still being confirmed can't be deleted yet (409). -->
+              @if (site.provisioningStatus !== 'Deleting' && site.provisioningStatus !== 'PendingPayment') {
                 @if (confirming() === site.name) {
                   <button type="button" class="btn-ghost" (click)="confirming.set(null)">
                     Keep
