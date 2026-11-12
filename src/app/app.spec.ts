@@ -17,9 +17,9 @@ describe('App', () => {
 
 describe('naming', () => {
   it('turns a company into a tenant slug', () => {
-    expect(tenantSlug('Acme Corp.')).toBe('acme-corp');
-    expect(tenantSlug('  Čokolada d.o.o. ')).toBe('cokolada-d-o-o');
-    expect(tenantSlug('')).toBe('tenant');
+    expect(tenantSlug('Jane', 'Doe', 'Acme Corp.')).toBe('jane-doe-acme-corp');
+    expect(tenantSlug('Žan', 'Čokolada', ' d.o.o. ')).toBe('zan-cokolada-d-o-o');
+    expect(tenantSlug('', '', '')).toBe('tenant');
   });
 
   it('builds the site host', () => {

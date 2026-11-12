@@ -116,7 +116,7 @@ export class WelcomePage {
     maxLength(p.company, 255, { message: 'Use at most 255 characters.' });
   });
 
-  protected readonly tenant = computed(() => tenantSlug(this.model().company));
+  protected readonly tenant = computed(() => tenantSlug(this.model().name, this.model().lastname, this.model().company));
   protected readonly invalid = showInvalid;
 
   protected async save(event: Event): Promise<void> {

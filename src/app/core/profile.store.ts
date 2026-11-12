@@ -18,8 +18,11 @@ export class ProfileStore {
     return !!(p?.name && p.lastname && p.company);
   });
 
-  /** Tenant part of site host names: assigned by UserService; before that, a preview from the company. */
-  readonly tenant = computed(() => this.state()?.tenant ?? tenantSlug(this.state()?.company));
+  /** Tenant part of site host names: assigned by UserService; before that, a preview from name, last name and company. */
+  readonly tenant = computed(() => {
+    const p = this.state();
+    return p?.tenant ?? tenantSlug(p?.name, p?.lastname, p?.company);
+  });
 
   readonly displayName = computed(() => {
     const p = this.state();
