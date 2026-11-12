@@ -9,9 +9,8 @@ import {
   submit,
 } from '@angular/forms/signals';
 import { Router } from '@angular/router';
-import { AuthService } from '../../core/api/auth.service';
+import { AuthError, AuthService } from '../../core/api/auth.service';
 import { APP_CONFIG } from '../../core/config';
-import { GraphQlError } from '../../core/http/graphql';
 import { BrandMark } from '../../shared/brand-mark';
 import { FieldError, showInvalid } from '../../shared/field-error';
 
@@ -189,7 +188,7 @@ export class LoginPage {
           await this.router.navigateByUrl('/sites');
         } catch (error) {
           this.error.set(
-            error instanceof GraphQlError && error.code && USER_FACING_CODES.includes(error.code)
+            error instanceof AuthError && error.code && USER_FACING_CODES.includes(error.code)
               ? error.message
               : 'Something went wrong. Please try again.',
           );

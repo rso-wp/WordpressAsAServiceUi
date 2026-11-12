@@ -12,6 +12,16 @@ export interface Credentials {
   password: string;
 }
 
+/** Sign-in / sign-up refused. UserService sets `code` (e.g. `EMAIL_TAKEN`) and a user-facing message. */
+export class AuthError extends Error {
+  constructor(
+    message: string,
+    readonly code: string | null,
+  ) {
+    super(message);
+  }
+}
+
 export abstract class AuthService {
   /** `password`: UserService accounts (email + password). `mock`: simulated, no backend. */
   abstract readonly kind: 'password' | 'mock';
