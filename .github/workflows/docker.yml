@@ -32,6 +32,8 @@ jobs:
         with:
           context: .
           file: Dockerfile
+          # The git tag (v1.2.3) is shown next to the product name in the app.
+          build-args: APP_VERSION=${{ github.ref_name }}
           platforms: linux/amd64
           push: true
           # A plain image manifest, without the extra attestation entry (it shows up as "unknown/unknown" on Docker Hub).
