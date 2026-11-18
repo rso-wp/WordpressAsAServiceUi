@@ -3,6 +3,6 @@ export interface Environment {
   backend: 'http' | 'mock';
   /** Prefix for API calls; empty = same origin (dev-server proxy locally, the gateway in production). */
   apiBaseUrl: string;
-  /** `password`: UserService accounts (email + password). `mock`: simulated, for `backend: 'mock'`. */
-  auth: { mode: 'password' } | { mode: 'mock' };
+  /** `keycloak`: accounts in Keycloak, found next to the app (core/auth/keycloak-config.ts). `mock`: simulated, for `backend: 'mock'`. */
+  auth: { mode: 'keycloak' } | { mode: 'mock' };
 }

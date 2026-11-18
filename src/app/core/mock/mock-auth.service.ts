@@ -2,7 +2,7 @@ import { Service, signal } from '@angular/core';
 import { AuthAccount, AuthService, Credentials } from '../api/auth.service';
 import { latency, readMock, removeMock, writeMock } from './mock-storage';
 
-/** Pretends to be UserService sign-in: any email and password work, always as the same demo user. */
+/** Pretends to be the sign-in: any email and password work, always as the same demo user. */
 @Service()
 export class MockAuthService extends AuthService {
   readonly kind = 'mock';
@@ -13,14 +13,14 @@ export class MockAuthService extends AuthService {
 
   async initialize(): Promise<void> {}
 
-  async signIn(credentials: Credentials): Promise<void> {
+  async signIn(credentials?: Credentials): Promise<void> {
     await latency(700);
-    this.start(credentials.email);
+    this.start(credentials?.email ?? '');
   }
 
-  async signUp(credentials: Credentials): Promise<void> {
+  async signUp(credentials?: Credentials): Promise<void> {
     await latency(700);
-    this.start(credentials.email);
+    this.start(credentials?.email ?? '');
   }
 
   async signOut(): Promise<void> {

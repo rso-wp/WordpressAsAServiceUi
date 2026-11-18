@@ -9,24 +9,16 @@ import {
   submit,
 } from '@angular/forms/signals';
 import { Router } from '@angular/router';
-import { AuthError, AuthService } from '../../core/api/auth.service';
+import { AuthService } from '../../core/api/auth.service';
 import { APP_CONFIG } from '../../core/config';
 import { BrandMark } from '../../shared/brand-mark';
 import { FieldError, showInvalid } from '../../shared/field-error';
 
 type Mode = 'signIn' | 'signUp';
 
-/** Same limits as UserService (AccountService). */
+/** Limits of the demo form (with Keycloak the password rules are Keycloak's: the realm's password policy). */
 const MIN_PASSWORD = 8;
 const MAX_PASSWORD = 128;
-
-/** UserService error codes whose message is meant for the user. */
-const USER_FACING_CODES = [
-  'INVALID_EMAIL',
-  'INVALID_PASSWORD',
-  'EMAIL_TAKEN',
-  'INVALID_CREDENTIALS',
-];
 
 @Component({
   selector: 'app-login-page',
@@ -62,75 +54,108 @@ const USER_FACING_CODES = [
       <main class="flex items-center justify-center px-6 py-12">
         <div class="w-full max-w-sm">
           <app-brand-mark class="mb-10 block text-wp-700 lg:hidden" />
-          <h1 class="text-2xl font-semibold text-slate-900">
-            {{ mode() === 'signIn' ? 'Welcome back' : 'Create your account' }}
-          </h1>
-          <p class="mt-2 text-slate-600">
-            @if (mode() === 'signIn') {
-              New here?
-              <button
-                type="button"
-                class="font-medium text-wp-700 underline"
-                (click)="switchTo('signUp')"
-              >
-                Create an account
-              </button>
-            } @else {
-              Already have an account?
-              <button
-                type="button"
-                class="font-medium text-wp-700 underline"
-                (click)="switchTo('signIn')"
-              >
-                Sign in
-              </button>
-            }
-          </p>
-
-          <form class="mt-8 space-y-5" novalidate (submit)="go($event)">
-            <div>
-              <label class="field-label" for="email">Email</label>
-              <input
-                id="email"
-                type="email"
-                class="field-input"
-                autocomplete="email"
-                [formField]="f.email"
-                [attr.aria-invalid]="invalid(f.email)"
-                aria-describedby="email-error"
-              />
-              <app-field-error [field]="f.email" errorId="email-error" />
-            </div>
-
-            <div>
-              <label class="field-label" for="password">Password</label>
-              <input
-                id="password"
-                type="password"
-                class="field-input"
-                [attr.autocomplete]="mode() === 'signIn' ? 'current-password' : 'new-password'"
-                [formField]="f.password"
-                [attr.aria-invalid]="invalid(f.password)"
-                aria-describedby="password-hint password-error"
-              />
-              @if (mode() === 'signUp') {
-                <p id="password-hint" class="mt-1 text-xs text-slate-600">
-                  At least {{ minPassword }} characters.
-                </p>
-              }
-              <app-field-error [field]="f.password" errorId="password-error" />
-            </div>
+          @if (auth.kind === 'keycloak') {
+            <h1 class="text-2xl font-semibold text-slate-900">Welcome</h1>
+            <p class="mt-2 text-slate-600">
+              Sign in to manage your sites, or create an account. You will be taken to our secure
+              sign-in page.
+            </p>
 
             @if (error(); as message) {
-              <p class="rounded-md bg-red-50 p-3 text-sm text-red-800" role="alert">
+              <p class="mt-6 rounded-md bg-red-50 p-3 text-sm text-red-800" role="alert">
                 {{ message }}
               </p>
             }
 
-            <button type="submit" class="btn-primary w-full py-3" [disabled]="pending()">
-              {{ submitLabel() }}
-            </button>
-          </form>
+            <div class="mt-8 space-y-3">
+              <button
+                type="button"
+                class="btn-primary w-full py-3"
+                [disabled]="pending()"
+                (click)="redirect('signIn')"
+              >
+                Sign in
+              </button>
+              <button
+                type="button"
+                class="btn-ghost w-full border border-slate-300 py-3"
+                [disabled]="pending()"
+                (click)="redirect('signUp')"
+              >
+                Create account
+              </button>
+            </div>
+          } @else {
+            <h1 class="text-2xl font-semibold text-slate-900">
+              {{ mode() === 'signIn' ? 'Welcome back' : 'Create your account' }}
+            </h1>
+            <p class="mt-2 text-slate-600">
+              @if (mode() === 'signIn') {
+                New here?
+                <button
+                  type="button"
+                  class="font-medium text-wp-700 underline"
+                  (click)="switchTo('signUp')"
+                >
+                  Create an account
+                </button>
+              } @else {
+                Already have an account?
+                <button
+                  type="button"
+                  class="font-medium text-wp-700 underline"
+                  (click)="switchTo('signIn')"
+                >
+                  Sign in
+                </button>
+              }
+            </p>
+
+            <form class="mt-8 space-y-5" novalidate (submit)="go($event)">
+              <div>
+                <label class="field-label" for="email">Email</label>
+                <input
+                  id="email"
+                  type="email"
+                  class="field-input"
+                  autocomplete="email"
+                  [formField]="f.email"
+                  [attr.aria-invalid]="invalid(f.email)"
+                  aria-describedby="email-error"
+                />
+                <app-field-error [field]="f.email" errorId="email-error" />
+              </div>
+
+              <div>
+                <label class="field-label" for="password">Password</label>
+                <input
+                  id="password"
+                  type="password"
+                  class="field-input"
+                  [attr.autocomplete]="mode() === 'signIn' ? 'current-password' : 'new-password'"
+                  [formField]="f.password"
+                  [attr.aria-invalid]="invalid(f.password)"
+                  aria-describedby="password-hint password-error"
+                />
+                @if (mode() === 'signUp') {
+                  <p id="password-hint" class="mt-1 text-xs text-slate-600">
+                    At least {{ minPassword }} characters.
+                  </p>
+                }
+                <app-field-error [field]="f.password" errorId="password-error" />
+              </div>
+
+              @if (error(); as message) {
+                <p class="rounded-md bg-red-50 p-3 text-sm text-red-800" role="alert">
+                  {{ message }}
+                </p>
+              }
+
+              <button type="submit" class="btn-primary w-full py-3" [disabled]="pending()">
+                {{ submitLabel() }}
+              </button>
+            </form>
+          }
 
           @if (auth.kind === 'mock') {
             <p class="mt-10 rounded-md bg-wp-50 p-3 text-xs text-wp-900">
@@ -173,6 +198,18 @@ export class LoginPage {
     this.error.set(null);
   }
 
+  /** Keycloak: sends the browser to its sign-in or registration page (the page unloads, so `pending` stays on). */
+  protected async redirect(mode: Mode): Promise<void> {
+    this.pending.set(true);
+    this.error.set(null);
+    try {
+      await (mode === 'signIn' ? this.auth.signIn() : this.auth.signUp());
+    } catch {
+      this.error.set('Could not reach the sign-in page. Please try again.');
+      this.pending.set(false);
+    }
+  }
+
   protected async go(event: Event): Promise<void> {
     event.preventDefault();
     await submit(this.f, {
@@ -186,12 +223,8 @@ export class LoginPage {
             : this.auth.signUp(credentials));
           // The guards send a first-time user to /welcome.
           await this.router.navigateByUrl('/sites');
-        } catch (error) {
-          this.error.set(
-            error instanceof AuthError && error.code && USER_FACING_CODES.includes(error.code)
-              ? error.message
-              : 'Something went wrong. Please try again.',
-          );
+        } catch {
+          this.error.set('Something went wrong. Please try again.');
         } finally {
           this.pending.set(false);
         }

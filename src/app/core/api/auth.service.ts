@@ -2,7 +2,7 @@ import { Signal } from '@angular/core';
 
 /** The signed-in account. */
 export interface AuthAccount {
-  /** UserService user id (the token's `sub`), the user id in every backend service. */
+  /** Keycloak user id (the token's `sub`), the user id in every backend service. */
   id: string;
   email: string;
 }
@@ -12,32 +12,25 @@ export interface Credentials {
   password: string;
 }
 
-/** Sign-in / sign-up refused. UserService sets `code` (e.g. `EMAIL_TAKEN`) and a user-facing message. */
-export class AuthError extends Error {
-  constructor(
-    message: string,
-    readonly code: string | null,
-  ) {
-    super(message);
-  }
-}
-
 export abstract class AuthService {
-  /** `password`: UserService accounts (email + password). `mock`: simulated, no backend. */
-  abstract readonly kind: 'password' | 'mock';
+  /** `keycloak`: Keycloak accounts (the browser goes to Keycloak to sign in or up). `mock`: simulated, no backend. */
+  abstract readonly kind: 'keycloak' | 'mock';
   abstract readonly account: Signal<AuthAccount | null>;
-  /** Runs once at startup (e.g. drops an expired session). */
+  /** Runs once at startup (e.g. finishes a sign-in that returns from Keycloak, or drops an expired session). */
   abstract initialize(): Promise<void>;
-  abstract signIn(credentials: Credentials): Promise<void>;
-  /** Creates the account, then signs it in. */
-  abstract signUp(credentials: Credentials): Promise<void>;
+  /** Mock: signs in with the credentials. Keycloak: sends the browser to Keycloak's sign-in page (no credentials here). */
+  abstract signIn(credentials?: Credentials): Promise<void>;
+  /** Mock: creates the account and signs it in. Keycloak: sends the browser to Keycloak's registration page. */
+  abstract signUp(credentials?: Credentials): Promise<void>;
+  /** Keycloak: also ends its session (the browser goes to Keycloak and comes back to /login). */
   abstract signOut(): Promise<void>;
-  /** Headers that authenticate an API request (the bearer token). */
+  /** Headers that authenticate an API request (the bearer token, renewed when it is about to expire). */
   abstract requestHeaders(): Promise<Record<string, string>>;
 }
 
 /** The backend no longer accepts the session (token expired, account gone): forget it and start over at sign-in. */
 export async function endSession(auth: AuthService): Promise<void> {
   await auth.signOut();
-  window.location.assign('/login');
+  // Keycloak's sign-out already brings the browser back to /login.
+  if (auth.kind !== 'keycloak') window.location.assign('/login');
 }
